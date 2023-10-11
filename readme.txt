@@ -1,10 +1,10 @@
 # Create the Virtual Environment
 export WORKON_HOME=~/.virtualenvs
 source /usr/share/virtualenvwrapper/virtualenvwrapper.sh
-mkvirtualenv --python=/usr/bin/python3.10 geowild  
+mkvirtualenv --python=/usr/bin/python3.10 digitalmap 
 
 # activate the virtual environment
-source ~/.virtualenvs/geowild/bin/activate
+source ~/.virtualenvs/digitalmap/bin/activate
 
 # This will use the same Python version of the virtualenv
 pip install Django==3.2.18
