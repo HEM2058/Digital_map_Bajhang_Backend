@@ -80,7 +80,7 @@ WSGI_APPLICATION = 'backend_digitalmap.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': 'digitalmap',  # Replace with your database name
+        'NAME': 'gis_database',  # Replace with your database name
         'USER': 'mappers',  # Replace with your database user
         'PASSWORD': 'mappers123',  # Replace with your database password
         'HOST': 'localhost',  # Replace with your database host

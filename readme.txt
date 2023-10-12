@@ -49,7 +49,7 @@ sudo -i -u postgres
 psql
 CREATE USER mappers with password 'mappers123';
 CREATE DATABASE digitalmap;
-GRANT ALL PRIVILEGES ON DATABASE digitalmap TO mappers;
+
 
 #Now switch to your ubuntu user and enter following command.
 #Note: You must install the postgis version associated with installed postgresql
@@ -57,5 +57,7 @@ sudo apt-get install postgresql-16-postgis-3
 
 #Connect to the your database you are wanting to install extension
 \c digitalmap
+GRANT ALL PRIVILEGES ON SCHEMA public TO mappers;
 CREATE EXTENSION postgis;
+
 
