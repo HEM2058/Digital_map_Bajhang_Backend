@@ -38,7 +38,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'shp_geojson',
-    'rest_framework'
+    'rest_framework',
+    'django.contrib.gis',
+    'rest_framework_gis',
 ]
 
 MIDDLEWARE = [
@@ -77,8 +79,12 @@ WSGI_APPLICATION = 'backend_digitalmap.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
+        'NAME': 'digitalmap',  # Replace with your database name
+        'USER': 'mappers',  # Replace with your database user
+        'PASSWORD': 'mappers123',  # Replace with your database password
+        'HOST': 'localhost',  # Replace with your database host
+        'PORT': '5432',  # Use the default PostgreSQL port (5432)
     }
 }
 
