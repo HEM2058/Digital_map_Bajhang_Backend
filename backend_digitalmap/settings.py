@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'django.contrib.gis',
     'rest_framework_gis',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -51,6 +52,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'backend_digitalmap.urls'
@@ -131,6 +133,16 @@ STATIC_URL = '/static/'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://192.168.8.101:3000"  # Replace with the actual domain of your React app
+]
+
+# Allow credentials (cookies, headers) to be sent in cross-origin requests.
+CORS_ALLOW_CREDENTIALS = True
+
+
 
 
 

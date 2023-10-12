@@ -14,8 +14,8 @@ class UploadZipAPIView(APIView):
     parser_classes = (MultiPartParser, FormParser)
 
     def post(self, request):
-        name = request.data.get('name')
-        zip_file = request.data.get('zip_file')
+        name = request.data.get('layerName')
+        zip_file = request.data.get('zipFile')
 
         if not name or not zip_file:
             return Response({'error': 'Both name and zip_file are required fields.'}, status=status.HTTP_400_BAD_REQUEST)
