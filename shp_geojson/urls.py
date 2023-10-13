@@ -3,5 +3,6 @@ from .views import UploadZipAPIView   # Import the GeoJSONFileUpload view
 
 urlpatterns = [
     # Add the URL pattern for the GeoJSONFileUpload view
-    path('uploadgeojson/', UploadZipAPIView.as_view(), name='upload_geojson'),  # Customize the URL endpoint as needed
+    path('uploadgeojson/', UploadZipAPIView.as_view(), name='upload_geojson'),  
+    path('geojson-features/', GeoJSONFeatureListView.as_view(), name='geojson-feature-list'),
 ]

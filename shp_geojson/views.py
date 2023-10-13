@@ -1,65 +1,95 @@
-import os
-import tempfile
-import geopandas as gpd
-from django.shortcuts import render
-from rest_framework import status
-from rest_framework.parsers import MultiPartParser, FormParser
-from rest_framework.response import Response
 from rest_framework.views import APIView
-from .models import GeoJSONFile
-from .serializers import GeoJSONFileSerializer
+from rest_framework import status
+from rest_framework.response import Response
+from .serializers import ShapefileUploadSerializer, ConvertedDataSerializer
+import tempfile
+import os
 import zipfile
-import io
-from shapely.geometry import shape
-import fiona
+import shapefile
+import json
+from .models import GeoJSONfeature # Import the GeoJSONFile model
 
 class UploadZipAPIView(APIView):
-    parser_classes = (MultiPartParser, FormParser)
-
     def post(self, request):
-        name = request.data.get('name')
-        zip_file = request.data.get('zip_file')
-        print(f"Received request to upload: {name}")
-        print(f"Received zip file: {zip_file}")
+        print("Inside function")
+        name = request.data.get('name')  # Assuming 'name' is a key in the POST request data
+        zip_file = request.data.get('zip_file')  # Assuming 'zip_file' is a key in the POST request data
+        print(f"Received name: {name}")
+        print(f"Received zip_file: {zip_file}")
 
-        if not name or not zip_file:
-            return Response({'error': 'Both name and zip_file are required fields.'}, status=status.HTTP_400_BAD_REQUEST)
+        if zip_file is None:
+            print("zip_file is missing in the POST request.")
+            return Response({'error': 'zip_file is required in the POST request.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        try:
-            # Create a temporary directory to extract and process the uploaded files
-            with tempfile.TemporaryDirectory() as temp_dir:
-                print(f"Temporary directory created: {temp_dir}")
+        serializer = ShapefileUploadSerializer(data={'name': name, 'zip_file': zip_file})
+        
+        if serializer.is_valid():
+            zip_file = serializer.validated_data['zip_file']
 
-                # Save the uploaded ZIP file
-                zip_file_path = os.path.join(temp_dir, zip_file.name)
-                with open(zip_file_path, 'wb') as destination:
-                    for chunk in zip_file.chunks():
-                        destination.write(chunk)
-                print(f"ZIP file saved: {zip_file_path}")
+            # Create a temporary directory to extract the contents of the zip file
+            temp_dir = tempfile.TemporaryDirectory()
+            print(f"Created temporary directory: {temp_dir.name}")
 
-                # Extract the ZIP file
-                with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
-                    # Assuming there's only one Shapefile in the ZIP, you might need to modify this if there are multiple files.
-                    shp_file = [f for f in zip_ref.namelist() if f.endswith('.shp')][0]
-                    print(f"Selected Shapefile: {shp_file}")
-                    with zip_ref.open(shp_file) as shp:
-                        with fiona.Collection(shp, 'r') as source:
-                            crs = source.crs
-                            features = [feature for feature in source]
+            try:
+                # Extract the contents of the zip file to the temporary directory
+                with zipfile.ZipFile(zip_file, 'r') as z:
+                    z.extractall(temp_dir.name)
+                print(f"Extracted files to: {temp_dir.name}")
 
+                # Find the .shp file in the extracted contents
+                shapefile_path = None
+                for root, dirs, files in os.walk(temp_dir.name):
+                    for file in files:
+                        if file.endswith(".shp"):
+                            shapefile_path = os.path.join(root, file)
+                            break
+                    if shapefile_path:
+                        break
+
+                if shapefile_path:
+                    print(f"Shapefile found: {shapefile_path}")
+                    # Read Shapefile and convert to GeoJSON
+                    shape_reader = shapefile.Reader(shapefile_path)
+                    fields = shape_reader.fields[1:]
+                    field_names = [field[0] for field in fields]
+                    features = []
+                    for shape_record in shape_reader.shapeRecords():
+                        geometry = shape_record.shape.__geo_interface__
+                        attributes = dict(zip(field_names, shape_record.record))
+                        features.append({
+                            'type': 'Feature',
+                            'geometry': geometry,
+                            'properties': attributes
+                        })
                     geojson_data = {
-                        "type": "FeatureCollection",
-                        "features": [shape(feat['geometry']).__geo_interface__ for feat in features],
+                        'type': 'FeatureCollection',
+                        'features': features
                     }
-                    print("Shapefile successfully converted to GeoJSON.")
 
-                    # Create a GeoJSONFile instance
-                    geojson_file = GeoJSONFile(name=name, geojson=geojson_data)
+                    # Save the converted GeoJSON data to the GeoJSONFile model
+                    geojson_file = GeoJSONfeature(name=name, geojson=geojson_data)
                     geojson_file.save()
-                    print("GeoJSON data saved in the database.")
 
-                return Response({'message': 'Data uploaded and converted to GeoJSON successfully'}, status=status.HTTP_201_CREATED)
+                    # Return the converted GeoJSON data
+                    return Response(geojson_data, status=status.HTTP_200_OK)
+                 
+                else:
+                    print("Shapefile not found in the uploaded ZIP file.")
+                    return Response({'error': 'Shapefile not found in the uploaded ZIP file.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        except Exception as e:
-            print(f"Error during Shapefile processing: {e}")
-            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            finally:
+                # Clean up extracted files and temporary directory
+                temp_dir.cleanup()
+                print("Temporary directory and extracted files cleaned up.")
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+
+class GeoJSONFeatureListView(APIView):
+    def get(self, request):
+        geojson_features = GeoJSONFeature.objects.all()
+        serializer = ConvertedDataSerializer(geojson_features, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

@@ -1,5 +1,8 @@
-from django.contrib.gis.db import models
+from django.db import models
 
-class GeoJSONFile(models.Model):
+
+class GeoJSONfeature(models.Model):
     name = models.CharField(max_length=255)
-    geojson = models.GeometryCollectionField()
+    geojson = models.JSONField()  
+
+   
