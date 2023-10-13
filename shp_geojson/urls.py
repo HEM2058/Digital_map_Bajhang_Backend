@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import UploadZipAPIView   # Import the GeoJSONFileUpload view
+from .views import UploadZipAPIView,GeoJSONFeatureListView  # Import the GeoJSONFileUpload view
 
 urlpatterns = [
     # Add the URL pattern for the GeoJSONFileUpload view

@@ -8,6 +8,7 @@ import zipfile
 import shapefile
 import json
 from .models import GeoJSONfeature # Import the GeoJSONFile model
+from rest_framework import generics
 
 class UploadZipAPIView(APIView):
     def post(self, request):
@@ -87,9 +88,6 @@ class UploadZipAPIView(APIView):
 
 
 
-
-class GeoJSONFeatureListView(APIView):
-    def get(self, request):
-        geojson_features = GeoJSONFeature.objects.all()
-        serializer = ConvertedDataSerializer(geojson_features, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+class GeoJSONFeatureListView(generics.ListAPIView):
+    queryset = GeoJSONfeature.objects.all()
+    serializer_class = ConvertedDataSerializer
