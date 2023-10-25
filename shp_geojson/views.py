@@ -9,6 +9,7 @@ import shapefile
 import json
 from .models import GeoJSONfeature # Import the GeoJSONFile model
 from rest_framework import generics
+from pyproj import Transformer
 
 class UploadZipAPIView(APIView):
     def post(self, request):
@@ -51,21 +52,25 @@ class UploadZipAPIView(APIView):
                     print(f"Shapefile found: {shapefile_path}")
                     # Read Shapefile and convert to GeoJSON
                     shape_reader = shapefile.Reader(shapefile_path)
+                    
+                    # Use the pyproj library to create a transformer for coordinate transformation
+                    transformer = Transformer.from_crs(shape_reader.crs.srs, 'EPSG:4326', always_xy=True)
+                    
                     fields = shape_reader.fields[1:]
                     field_names = [field[0] for field in fields]
                     features = []
                     for shape_record in shape_reader.shapeRecords():
+                        # Transform the geometry to EPSG:4326 (WGS84)
                         geometry = shape_record.shape.__geo_interface__
+                        geometry = json.loads(json.dumps(geometry, ensure_ascii=True))
+                        geometry['coordinates'] = transformer.transform(*geometry['coordinates'])
+                
                         attributes = dict(zip(field_names, shape_record.record))
                         features.append({
                             'type': 'Feature',
                             'geometry': geometry,
                             'properties': attributes
                         })
-                    geojson_data = {
-                        'type': 'FeatureCollection',
-                        'features': features
-                    }
 
                     # Save the converted GeoJSON data to the GeoJSONFile model
                     geojson_file = GeoJSONfeature(name=name, geojson=geojson_data)
