@@ -114,3 +114,7 @@ class UploadZipAPIView(APIView):
 class GeoJSONFeatureListView(generics.ListAPIView):
     queryset = GeoJSONfeature.objects.all()
     serializer_class = ConvertedDataSerializer
+
+class SingleGeoJSONFeatureListView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = GeoJSONfeature.objects.all()
+    serializer_class = ConvertedDataSerializer
