@@ -43,7 +43,7 @@ def publish_shapefile(name, workspace_name, store_name):
     geo = Geoserver(GEOSERVER_URL, username='admin', password='geoserver')
 
     # Creating a feature store in GeoServer
-    geo.create_featurestore(store_name=store_name, workspace=workspace_name, db='postgres', host='localhost', pg_user='postgres',
+    geo.create_featurestore(store_name=store_name, workspace=workspace_name, db='gis', host='localhost', pg_user='mappers',
                          pg_password='mappers123', schema='public')
     print(f'Feature store "{store_name}" created in workspace "{workspace_name}".')
 
@@ -64,4 +64,4 @@ def publish_shapefile(name, workspace_name, store_name):
 def import_and_publish_shapefile(sender, instance, created, **kwargs):
     if created:
         import_shapefile(instance.file.path, instance.name)
-        publish_shapefile(instance.name, workspace_name='digitalmap', store_name='digitalmap123')
+        publish_shapefile(instance.name, workspace_name='digitalmap', store_name='digitalmap455')
