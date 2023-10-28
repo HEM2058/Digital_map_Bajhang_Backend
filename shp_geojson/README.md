@@ -110,6 +110,6 @@ sudo chown -R USER_NAME /usr/share/geoserver/
    sudo systemctl enable geoserver-startup
    # Start the service for the current session:
    sudo systemctl start geoserver-startup
-   #To check the status of the service:
+   # To check the status of the service:
    sudo systemctl status geoserver-startup
 
