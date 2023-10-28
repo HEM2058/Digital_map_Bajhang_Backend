@@ -61,3 +61,55 @@ GRANT ALL PRIVILEGES ON SCHEMA public TO mappers;
 CREATE EXTENSION postgis;
 
 
+#Geoserver installation and auto startup
+sudo -u root -i
+sudo apt-get update
+
+#Geoserver currently only supports JAVA-JRE-8, you can install it by typing
+sudo apt-get install openjdk-8-jdk
+sudo apt-get install openjdk-8-jre
+
+#To cross-check installation, type
+java -version 
+
+#We’ll create a new directory and put GeoServer in it
+cd /usr/share
+mkdir geoserver
+cd geoserver
+wget https://build.geoserver.org/geoserver/main/geoserver-main-latest-bin.zip
+
+#The next step is to unzip the geoserver-main-latest-bin.zip.
+unzip geoserver-main-latest-bin.zip
+
+#Finally, we’ll set up a variable to make it workable
+echo "export GEOSERVER_HOME=/usr/share/geoserver" >> ~/.profile
+. ~/.profile
+
+#and make sure that the user is the owner of this folder as well
+sudo chown -R USER_NAME /usr/share/geoserver/
+
+#If you want to auto start the geoserver on booting you should follow following steps also
+   #Create a systemd service unit file. For example, let's assume you want to start a script called startup.sh in the /usr/share/geoserver/bin/ directory:
+   #Create a new service unit file with the .service extension in the /etc/systemd/system/ directory. You can use a text editor to create the file:
+   sudo nano /etc/systemd/system/geoserver-startup.service
+
+   #Add the following content to the file (adjust the ExecStart line to point to your script or command):
+   [Unit]
+   Description=Start GeoServer on Boot
+
+   [Service]
+   Environment="GEOSERVER_HOME=/usr/share/geoserver"
+   ExecStart=/usr/share/geoserver/bin/startup.sh
+
+   [Install]
+   WantedBy=multi-user.target
+   
+   #Reload systemd to pick up the changes:
+   sudo systemctl daemon-reload
+   #Enable the service to start on boot:
+   sudo systemctl enable geoserver-startup
+   #Start the service for the current session:
+   sudo systemctl start geoserver-startup
+   #To check the status of the service:
+   sudo systemctl status geoserver-startup
+
