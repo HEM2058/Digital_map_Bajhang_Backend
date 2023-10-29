@@ -10,7 +10,6 @@ import glob
 from geoalchemy2 import Geometry, WKTElement
 from geo.Geoserver import Geoserver
 from sqlalchemy import create_engine, text  # Import the text function
-
 # Set the GeoServer URL
 GEOSERVER_URL = 'http://localhost:8080/geoserver'
 
@@ -19,17 +18,35 @@ class GeoJSONfeature(models.Model):
     name = models.CharField(max_length=255)
     geojson = models.JSONField()
 
+# Define the 'localLevels' list with the available choices
+localLevels = [
+    'Bithadchir',
+    'Bungal',
+    'Chabispathivera',
+    'Durgathali',
+    'JayaPrithivi',
+    'Kedarseu',
+    'Khaptadchhanna',
+    'Masta',
+    'Saipal',
+    'Surma',
+    'Talkot',
+    'Thalara',
+]
+
 class Geoshp(models.Model):
-    name = models.CharField(max_length=50)
-    description = models.CharField(max_length=150, blank=True)
-    file = models.FileField(upload_to='%Y/%m/%d')
-    uploaded_date = models.DateField(default=datetime.date.today, blank=True)
+    Palika = models.CharField(max_length=50, choices=[('', 'Select Palika')] + [(level, level) for level in localLevels], null=True)
+    store = models.CharField(max_length=50, null=True)
+    name = models.CharField(max_length=50, null=True)
+    description = models.CharField(max_length=150, blank=True, null=True)
+    file = models.FileField(upload_to='%Y/%m/%d', null=True)
+    uploaded_date = models.DateField(default=datetime.date.today, blank=True, null=True)
 
     def __str__(self):
         return self.name
 
 # Connect to the PostgreSQL database
-conn_str = 'postgresql://postgres:mappers123@localhost:5432/gis'
+conn_str = 'postgresql://postgres:mappers123@localhost:5432/map'
 engine = create_engine(conn_str)
 
 # Define a function to import a shapefile into the PostgreSQL database
@@ -41,9 +58,10 @@ def import_shapefile(shapefile_path, name):
 # Define a function to publish a shapefile to GeoServer with a specific workspace and store name
 def publish_shapefile(name, workspace_name, store_name):
     geo = Geoserver(GEOSERVER_URL, username='admin', password='geoserver')
-
+    print("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+    print(f'name="{name}",workspace="{workspace_name}",store="{store_name}".')
     # Creating a feature store in GeoServer
-    geo.create_featurestore(store_name=store_name, workspace=workspace_name, db='gis', host='localhost', pg_user='mappers',
+    geo.create_featurestore(store_name=store_name, workspace=workspace_name, db='map', host='localhost', pg_user='mappers',
                          pg_password='mappers123', schema='public')
     print(f'Feature store "{store_name}" created in workspace "{workspace_name}".')
 
@@ -64,7 +82,9 @@ def publish_shapefile(name, workspace_name, store_name):
 def import_and_publish_shapefile(sender, instance, created, **kwargs):
     if created:
         import_shapefile(instance.file.path, instance.name)
-        publish_shapefile(instance.name, workspace_name='digitalmap', store_name='digitalmap55')
+        if instance.Palika and instance.store:
+            print(f"Imported and published shapefile '{instance.name}' with Palika='{instance.Palika}' and store='{instance.store}'")
+            publish_shapefile(instance.name, workspace_name=instance.Palika, store_name=instance.store)
 
 # Define a signal handler to delete data when a Geoshp instance is deleted
 @receiver(models.signals.post_delete, sender=Geoshp)
@@ -78,4 +98,3 @@ def delete_data(sender, instance, **kwargs):
     # Connect to GeoServer and delete the layer
     geo = Geoserver(GEOSERVER_URL, username='admin', password='geoserver')
     geo.delete_layer(instance.name)
-  
