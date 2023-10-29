@@ -7,9 +7,9 @@ import geopandas as gpd
 import os
 import zipfile
 import glob
-from sqlalchemy import create_engine
 from geoalchemy2 import Geometry, WKTElement
 from geo.Geoserver import Geoserver
+from sqlalchemy import create_engine, text  # Import the text function
 
 # Set the GeoServer URL
 GEOSERVER_URL = 'http://localhost:8080/geoserver'
@@ -65,3 +65,16 @@ def import_and_publish_shapefile(sender, instance, created, **kwargs):
     if created:
         import_shapefile(instance.file.path, instance.name)
         publish_shapefile(instance.name, workspace_name='digitalmap', store_name='digitalmap455')
+
+# Define a signal handler to delete data when a Geoshp instance is deleted
+@receiver(models.signals.post_delete, sender=Geoshp)
+def delete_data(sender, instance, **kwargs):
+    # Delete the table from the PostgreSQL database
+    conn = engine.connect()  # Obtain a connection from the engine
+    delete_sql = text(f'DROP TABLE IF EXISTS "public"."{instance.name}"')
+    conn.execute(delete_sql)  # Execute the SQL command
+    conn.close()  # Close the connection
+
+    # Connect to GeoServer and delete the layer
+    geo = Geoserver(GEOSERVER_URL, username='admin', password='geoserver')
+    geo.delete_layer(instance.name)
