@@ -51,20 +51,20 @@ def publish_shapefile(name, workspace_name, store_name):
     geo.publish_featurestore(workspace=workspace_name, store_name=store_name, pg_table=name)
     print(f'Shapefile "{name}" published to GeoServer feature store "{store_name}" in workspace "{workspace_name}".')
 
-    # # Creating an outline feature style
-    # geo.create_outline_featurestyle(store_name, workspace=workspace_name)
-    # print(f'Outline feature style created for feature store "{store_name}" in workspace "{workspace_name}".')
+    # Creating an outline feature style
+    geo.create_outline_featurestyle(store_name, workspace=workspace_name)
+    print(f'Outline feature style created for feature store "{store_name}" in workspace "{workspace_name}".')
 
-    # # Publishing the style
-    # geo.publish_style(layer_name=name, style_name=store_name, workspace=workspace_name)
-    # print(f'Style "{store_name}" published for shapefile "{name}" in workspace "{workspace_name}".')
+    # Publishing the style
+    geo.publish_style(layer_name=name, style_name=store_name, workspace=workspace_name)
+    print(f'Style "{store_name}" published for shapefile "{name}" in workspace "{workspace_name}".')
 
 # Define a signal handler to import and publish a shapefile when a new Shapefile object is created
 @receiver(models.signals.post_save, sender=Geoshp)
 def import_and_publish_shapefile(sender, instance, created, **kwargs):
     if created:
         import_shapefile(instance.file.path, instance.name)
-        publish_shapefile(instance.name, workspace_name='digitalmap', store_name='digitalmap455')
+        publish_shapefile(instance.name, workspace_name='digitalmap', store_name='digitalmap55')
 
 # Define a signal handler to delete data when a Geoshp instance is deleted
 @receiver(models.signals.post_delete, sender=Geoshp)
@@ -78,3 +78,4 @@ def delete_data(sender, instance, **kwargs):
     # Connect to GeoServer and delete the layer
     geo = Geoserver(GEOSERVER_URL, username='admin', password='geoserver')
     geo.delete_layer(instance.name)
+  
