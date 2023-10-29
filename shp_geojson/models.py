@@ -69,13 +69,13 @@ def publish_shapefile(name, workspace_name, store_name):
     geo.publish_featurestore(workspace=workspace_name, store_name=store_name, pg_table=name)
     print(f'Shapefile "{name}" published to GeoServer feature store "{store_name}" in workspace "{workspace_name}".')
 
-    # Creating an outline feature style
-    geo.create_outline_featurestyle(store_name, workspace=workspace_name)
-    print(f'Outline feature style created for feature store "{store_name}" in workspace "{workspace_name}".')
+    # # Creating an outline feature style
+    # geo.create_outline_featurestyle(store_name, workspace=workspace_name)
+    # print(f'Outline feature style created for feature store "{store_name}" in workspace "{workspace_name}".')
 
-    # Publishing the style
-    geo.publish_style(layer_name=name, style_name=store_name, workspace=workspace_name)
-    print(f'Style "{store_name}" published for shapefile "{name}" in workspace "{workspace_name}".')
+    # # Publishing the style
+    # geo.publish_style(layer_name=name, style_name=store_name, workspace=workspace_name)
+    # print(f'Style "{store_name}" published for shapefile "{name}" in workspace "{workspace_name}".')
 
 # Define a signal handler to import and publish a shapefile when a new Shapefile object is created
 @receiver(models.signals.post_save, sender=Geoshp)
