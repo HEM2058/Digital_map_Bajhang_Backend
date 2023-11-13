@@ -1,13 +1,13 @@
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
-from .serializers import ShapefileUploadSerializer, ConvertedDataSerializer, Geoshpserializer
+from .serializers import ShapefileUploadSerializer, ConvertedDataSerializer, Geoshpserializer, ReliefrequestSerializer
 import tempfile
 import os
 import zipfile
 import shapefile
 import json
-from .models import GeoJSONfeature,Geoshp  # Import the GeoJSONFile model
+from .models import GeoJSONfeature,Geoshp,Reliefrequest  # Import the GeoJSONFile model
 from rest_framework import generics
 from pyproj import Transformer, CRS
 
@@ -122,3 +122,8 @@ class SingleGeoJSONFeatureListView(generics.RetrieveUpdateDestroyAPIView):
 class GeoshpView(generics.ListAPIView):
     queryset = Geoshp.objects.all()
     serializer_class = Geoshpserializer
+
+class ReliefrequestView(generics.ListCreateAPIView):
+    queryset = Reliefrequest.objects.all()
+    serializer_class = ReliefrequestSerializer
+

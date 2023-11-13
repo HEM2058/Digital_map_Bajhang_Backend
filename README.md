@@ -141,3 +141,10 @@ sudo systemctl enable geoserver-startup
 sudo systemctl start geoserver-startup
 #To check the status of the service:
 sudo systemctl status geoserver-startup
+
+# Allow cross origin resource sharing (CORS)
+
+sudo apt install vim
+sudo vim web.xml
+
+# use arrow keys to move down until you find a line with CORS in Jetty written.Once you find it, Uncomment the code and again search for CORS, Since we are not using tomcat, you can keep CORS related to tomcat commented. You can find the third and final code for CORS.

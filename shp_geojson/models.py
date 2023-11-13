@@ -18,6 +18,20 @@ class GeoJSONfeature(models.Model):
     name = models.CharField(max_length=255)
     geojson = models.JSONField()
 
+class Reliefrequest(models.Model):
+    #location information
+    palika = models.CharField(max_length=255)
+    ward = models.CharField(max_length=255)
+    location = models.CharField(max_length=255)
+    #client information
+    name = models.CharField(max_length=255)
+    phone = models.BigIntegerField()
+    citizenship_no = models.CharField(max_length=255)
+    House_no = models.CharField(max_length=255)
+    disaster = models.CharField(max_length=255)
+    img = models.FileField(upload_to='%Y/%m/%d', null=True)
+    uploaded_date = models.DateField(default=datetime.date.today, blank=True, null=True)
+
 # Define the 'localLevels' list with the available choices
 localLevels = [
     'Bithadchir',
@@ -41,7 +55,7 @@ class Geoshp(models.Model):
     description = models.CharField(max_length=150, blank=True, null=True)
     file = models.FileField(upload_to='%Y/%m/%d', null=True)
     uploaded_date = models.DateField(default=datetime.date.today, blank=True, null=True)
-
+    
     def __str__(self):
         return self.name
 
