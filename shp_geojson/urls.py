@@ -7,6 +7,7 @@ urlpatterns = [
     path('geojson-features/', GeoJSONFeatureListView.as_view(), name='geojson-feature-list'),
     path('geojson-features/<int:pk>', SingleGeoJSONFeatureListView.as_view(), name='single-geojson-feature-list'),
     path('geoshp/', GeoshpView.as_view(),name="geoshp"),
-    path('relief_request',ReliefrequestView.as_view(),name='relief_request')
+    path('relief_request',ReliefrequestView.as_view(),name='relief_request'),
+  
     
 ]

@@ -18,5 +18,7 @@ from django.urls import path,include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('',include("shp_geojson.urls")),
+    path('api/',include("shp_geojson.urls")),
+    path('auth/',include("djoser.urls")),
+    path('auth/',include("djoser.urls.authtoken")),
 ]

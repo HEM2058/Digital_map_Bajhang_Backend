@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
-from .serializers import ShapefileUploadSerializer, ConvertedDataSerializer, Geoshpserializer, ReliefrequestSerializer
+from .serializers import ShapefileUploadSerializer, ConvertedDataSerializer, GeoshpSerializer, ReliefrequestSerializer
 import tempfile
 import os
 import zipfile
@@ -119,9 +119,18 @@ class SingleGeoJSONFeatureListView(generics.RetrieveUpdateDestroyAPIView):
     queryset = GeoJSONfeature.objects.all()
     serializer_class = ConvertedDataSerializer
 
-class GeoshpView(generics.ListAPIView):
+class GeoshpView(generics.ListCreateAPIView):
     queryset = Geoshp.objects.all()
-    serializer_class = Geoshpserializer
+    serializer_class = GeoshpSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def perform_create(self, serializer):
+        serializer.save()
 
 class ReliefrequestView(generics.ListCreateAPIView):
     queryset = Reliefrequest.objects.all()

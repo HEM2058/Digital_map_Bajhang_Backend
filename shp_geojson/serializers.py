@@ -9,10 +9,10 @@ class ConvertedDataSerializer(serializers.ModelSerializer):
         model = GeoJSONfeature
         fields = ("name",'geojson')
 
-class Geoshpserializer(serializers.ModelSerializer):
-      class Meta:
+class GeoshpSerializer(serializers.ModelSerializer):
+    class Meta:
         model = Geoshp
-        fields = ("id","Palika","name")
+        fields = '__all__'
 
 class ReliefrequestSerializer(serializers.ModelSerializer):
     class Meta:
