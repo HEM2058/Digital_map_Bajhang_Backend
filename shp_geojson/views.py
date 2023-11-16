@@ -137,3 +137,16 @@ class ReliefrequestView(generics.ListCreateAPIView):
     queryset = Reliefrequest.objects.all()
     serializer_class = ReliefrequestSerializer
 
+class SingleReliefrequestView(generics.ListAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ReliefrequestSerializer
+    lookup_field = 'palika'  # Set the lookup field to match your URL parameter
+
+    def get_queryset(self):
+        # Retrieve the Palika parameter from the URL
+        palika = self.kwargs['palika']
+        
+        # Filter ReliefRequest objects based on Palika
+        queryset = Reliefrequest.objects.filter(palika=palika)
+
+        return queryset

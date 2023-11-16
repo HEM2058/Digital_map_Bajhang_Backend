@@ -141,28 +141,26 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://192.168.8.101:3000", # Replace with the actual domain of your React app
-    "http://127.0.0.1:5500",
+   
 ]
 
-# Allow credentials (cookies, headers) to be sent in cross-origin requests.
-CORS_ALLOW_CREDENTIALS = True
 
 
 
 
 DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10 MB
+# settings.py
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication',
-    )}
-
-# djoser for the authentication for the palikas
-
+        'rest_framework.authentication.TokenAuthentication',  # Use TokenAuthentication for token-based authentication
+    ),
+}
 
 DJOSER = {
-    "USER_ID_FIELD": "username",
-     "LOGIN_FIELD": "email",
-     'USER_CREATE_PASSWORD_RETYPE': True,
+    'USER_ID_FIELD': 'username',
+    'LOGIN_FIELD': 'email',
+    'USER_CREATE_PASSWORD_RETYPE': True,
 }
