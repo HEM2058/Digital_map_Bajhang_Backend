@@ -11,6 +11,8 @@ from .models import GeoJSONfeature,Geoshp,Reliefrequest  # Import the GeoJSONFil
 from rest_framework import generics
 from pyproj import Transformer, CRS
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.pagination import PageNumberPagination
+
 class UploadZipAPIView(APIView):
     def post(self, request):
         print("Inside function")
@@ -132,15 +134,21 @@ class GeoshpView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         serializer.save()
 
-class ReliefrequestView(generics.ListCreateAPIView):
-    permission_classes = [IsAuthenticated]
+class ReliefrequestView(generics.CreateAPIView):
     queryset = Reliefrequest.objects.all()
     serializer_class = ReliefrequestSerializer
+
+class CustomPagination(PageNumberPagination):
+    page_size = 5  # Number of items per page
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
 
 class SingleReliefrequestView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = ReliefrequestSerializer
     lookup_field = 'palika'  # Set the lookup field to match your URL parameter
+    pagination_class = CustomPagination  # Use the custom pagination class
 
     def get_queryset(self):
         # Retrieve the Palika parameter from the URL
