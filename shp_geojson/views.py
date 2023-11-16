@@ -10,7 +10,7 @@ import json
 from .models import GeoJSONfeature,Geoshp,Reliefrequest  # Import the GeoJSONFile model
 from rest_framework import generics
 from pyproj import Transformer, CRS
-
+from rest_framework.permissions import IsAuthenticated
 class UploadZipAPIView(APIView):
     def post(self, request):
         print("Inside function")
@@ -133,6 +133,7 @@ class GeoshpView(generics.ListCreateAPIView):
         serializer.save()
 
 class ReliefrequestView(generics.ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
     queryset = Reliefrequest.objects.all()
     serializer_class = ReliefrequestSerializer
 
