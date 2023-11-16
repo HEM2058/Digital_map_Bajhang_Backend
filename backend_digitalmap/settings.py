@@ -46,6 +46,8 @@ INSTALLED_APPS = [
     'djoser'
 ]
 
+
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
